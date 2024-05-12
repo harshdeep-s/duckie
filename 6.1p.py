@@ -28,18 +28,13 @@ class LaneDetector:
         rospy.loginfo("image_callback")
 
         # Convert to opencv image 
-        img = self.cv_bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
-        crop_section = img[100:500, 100:600]
-
-        hsv_img = cv2.cvtColor(crop_section, cv2.COLOR_BGR2HSV) 
-        lower_white = np.array([0, 0, 200])  
-        upper_white = np.array([255, 50, 255])  
-
-        lower_yellow = np.array([20, 100, 100])  
-        upper_yellow = np.array([40, 255, 255])  
-
-        white_pixel = cv2.inRange(hsv_img, lower_white, upper_white)
-        yellow_pixel = cv2.inRange(hsv_img, lower_yellow, upper_yellow)
+        img = self.cv_bridge.compressed_imgmsg_to_cv2(msg, "bgr8") 
+       
+        # Apply color space conversion directly to the cropped image
+        hsv_img = cv2.cvtColor(img[100:500, 100:600], cv2.COLOR_BGR2HSV)   
+        # Create masks for white and yellow colors using cv2.inRange()
+        white_pixel = cv2.inRange(hsv_img, np.array([0, 0, 200])  ,np.array([255, 50, 255]) )
+        yellow_pixel = cv2.inRange(hsv_img, np.array([20, 100, 100]), np.array([40, 255, 255]))
 
         line_white = self.Hough_lines_apply(cv2.Canny(white_pixel, 50, 150))
         line_yellow = self.Hough_lines_apply(cv2.Canny(yellow_pixel, 50, 150))
