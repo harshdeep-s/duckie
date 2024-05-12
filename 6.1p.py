@@ -23,6 +23,19 @@ class LaneDetector:
         self.cv_bridge = CvBridge()
         self.image_sub = rospy.Subscriber('/myduckie/camera_node/image/compressed', CompressedImage, self.image_callback, queue_size=1)
         rospy.init_node("my_lane_detector")
+
+    
+    def detect_line_draw(self, img, lines):
+        if lines is not None:
+            i=0
+            while i < len(lines):
+                line = lines[i]
+                x1, y1, x2, y2 = line[0]
+                cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                i += 1
+
+    def Hough_lines_apply(self, img):
+        return cv2.HoughLinesP(img, rho=1, theta=np.pi/180, threshold=100, minLineLength=50, maxLineGap=50)
         
     def image_callback(self, msg):
         rospy.loginfo("image_callback")
@@ -52,18 +65,6 @@ class LaneDetector:
         cv2.imshow('Detected Lines', crop_section)
         cv2.waitKey(1)
 
-    def Hough_lines_apply(self, img):
-        return cv2.HoughLinesP(img, rho=1, theta=np.pi/180, threshold=100, minLineLength=50, maxLineGap=50)
-       
-
-    def detect_line_draw(self, img, lines):
-        if lines is not None:
-            i=0
-            while i < len(lines):
-                line = lines[i]
-                x1, y1, x2, y2 = line[0]
-                cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                i += 1
 
     def run(self):
         rospy.spin()
