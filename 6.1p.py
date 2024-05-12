@@ -53,9 +53,14 @@ class LaneDetector:
 
     def detect_line_draw(self, img, lines):
         if lines is not None:
-            for line in lines:
+            i=0
+            while i < len(lines):
+                line = lines[i]
                 x1, y1, x2, y2 = line[0]
                 cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                i += 1
+                
+            
 
     def run(self):
         rospy.spin()
